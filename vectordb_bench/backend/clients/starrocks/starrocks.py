@@ -107,5 +107,6 @@ class StarRocks(VectorDB):
             f"LIMIT {k}"
         )
 
+        log.info(f"StarRocks SQL: {sql}")
         self._cursor.execute(sql)
         return [row[0] for row in self._cursor.fetchall()]
