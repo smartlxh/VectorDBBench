@@ -343,6 +343,7 @@ class DatasetManager(BaseModel):
         self,
         source: DatasetSource = DatasetSource.S3,
         filters: Filter = non_filter,
+        skip_train_data: bool = False,
     ) -> bool:
         """Download the dataset from DatasetSource
          url = f"{source}/{self.data.dir_name}"
@@ -351,6 +352,8 @@ class DatasetManager(BaseModel):
             source(DatasetSource): S3 or AliyunOSS, default as S3
             filters(Filter): combined with dataset's with_gt to
               compose the correct ground_truth file
+            skip_train_data(bool): if True, skip downloading train data files
+              (only download test and ground truth files for search evaluation)
 
         Returns:
             bool: whether the dataset is successfully prepared
@@ -362,7 +365,7 @@ class DatasetManager(BaseModel):
             gt_file, test_file = filters.groundtruth_file, self.data.test_file
 
         if self.data.with_remote_resource:
-            download_files = [file for file in self.train_files]
+            download_files = [] if skip_train_data else [file for file in self.train_files]
             download_files.extend([gt_file, test_file])
             if self.data.with_scalar_labels and self.data.scalar_labels_file_separated:
                 download_files.append(self.data.scalar_labels_file)
