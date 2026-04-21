@@ -26,6 +26,7 @@ from ..backend.clients.pgvector.cli import PgVectorHNSW
 from ..backend.clients.pgvectorscale.cli import PgVectorScaleDiskAnn
 from ..backend.clients.pinecone.cli import Pinecone
 from ..backend.clients.pinot.cli import Pinot
+from ..backend.clients.starrocks.cli import StarRocks
 from ..backend.clients.polardb.cli import (
     PolarDBHNSWFlat,
     PolarDBHNSWPQ,
@@ -95,6 +96,7 @@ cli.add_command(Pinot)
 cli.add_command(PolarDBHNSWFlat)
 cli.add_command(PolarDBHNSWPQ)
 cli.add_command(PolarDBHNSWSQ)
+cli.add_command(StarRocks)
 
 
 if __name__ == "__main__":
