@@ -35,6 +35,9 @@ class StarRocksConfig(DBConfig):
 class StarRocksCaseConfig(BaseModel, DBCaseConfig):
     metric_type: MetricType = MetricType.COSINE
     sql_hint: str = ""
+    vector_column: str = "embedding"
+    metric_override: str = ""
+    log_sql: bool = True
 
     def index_param(self) -> dict:
         return {}
@@ -42,14 +45,20 @@ class StarRocksCaseConfig(BaseModel, DBCaseConfig):
     def search_param(self) -> dict:
         return {}
 
+    def _effective_metric(self) -> MetricType:
+        if self.metric_override:
+            return MetricType[self.metric_override.upper()]
+        return self.metric_type
+
     def parse_metric_func(self) -> str:
-        if self.metric_type == MetricType.L2:
+        m = self._effective_metric()
+        if m == MetricType.L2:
             return "approx_l2_distance"
-        if self.metric_type == MetricType.IP:
+        if m == MetricType.IP:
             return "approx_inner_product"
         return "approx_cosine_similarity"
 
     def parse_order(self) -> str:
-        if self.metric_type == MetricType.L2:
+        if self._effective_metric() == MetricType.L2:
             return "ASC"
         return "DESC"

@@ -38,6 +38,7 @@ class StarRocks(VectorDB):
         self._cursor = None
         self.expr = ""
         self._sql_hint = db_case_config.sql_hint
+        self._vector_column = db_case_config.vector_column
 
         log.info(f"StarRocks initialized, table={self.table_name}, drop_old={drop_old}")
 
@@ -103,10 +104,11 @@ class StarRocks(VectorDB):
         sql = (
             f"SELECT{hint} id FROM {self.table_name} "
             f"{self.expr} "
-            f"ORDER BY {metric_func}(embedding, {vec_str}) {order} "
+            f"ORDER BY {metric_func}({self._vector_column}, {vec_str}) {order} "
             f"LIMIT {k}"
         )
 
-        log.info(f"StarRocks SQL: {sql}")
+        if self.db_case_config.log_sql:
+            log.info(f"StarRocks SQL: {sql}")
         self._cursor.execute(sql)
         return [row[0] for row in self._cursor.fetchall()]
